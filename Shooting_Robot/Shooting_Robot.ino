@@ -1,4 +1,8 @@
 int PS4Controller[30];
+#include <JrkG2.h>
+JrkG2I2C jrk;
+JrkG2I2C leftJrk(12);
+JrkG2I2C rightJrk(11);
 
 enum PS4Variable {
   LStickX,
@@ -35,6 +39,9 @@ enum PS4Variable {
 };
 
 void setup() {
+  //set up I2C
+  Wire.begin();
+  
   // Start serial communication at 115200 baud
   Serial.begin(115200);
 
@@ -70,11 +77,26 @@ void Receive() {
   }
 }
 
+void Drive(){
+  if (PS4Controller[LStickY] > 20){
+  leftJrk.setTarget(2348);
+  rightJrk.setTarget(2348);
+  }  else if (PS4Controller[LStickY] < -20){
+  leftJrk.setTarget(1748);
+  rightJrk.setTarget(1748);
+  }
+  if (PS4Controller[LStickY] > -10 && PS4Controller[LStickY] < 10){
+    leftJrk.stopMotor();
+    rightJrk.stopMotor();
+  }
+
+  
+  Serial.println(PS4Controller[LStickY]);
+}
+
 
 void loop() {
+Drive();
 Receive();
-
 //Serial.println(PS4Controller[RStickX]);
-
-
 }
