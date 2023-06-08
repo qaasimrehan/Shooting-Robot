@@ -1,4 +1,8 @@
 int PS4Controller[30];
+// motor A connections
+int in1 = 8;
+int in2 = 7;
+//libraries
 #include <JrkG2.h>
 JrkG2I2C jrk;
 JrkG2I2C leftJrk(12);
@@ -37,11 +41,17 @@ enum PS4Variable {
   Battery,
   NumPS4Variables
 };
-
 //Deadzone
 const int deadzone = 20;  // Anything between -20 and 20 is stop
 
 void setup() {
+//  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  
+  // Turn off motors - Initial state
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
   //set up I2C
   Wire.begin();
 
@@ -135,6 +145,18 @@ speed_b = map(speed_b, -255, 255, 1448, 2648);
   rightJrk.setTarget(speed_b);
 }
 
+void Shoot(){
+  
+  if (PS4Controller[Circle] == 1){
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+  }
+  else{
+   digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  }                                                                   
+}
+
 void loop() {
   Receive();
 int y = pulseToPWM(PS4Controller[LStickY]);
@@ -142,11 +164,13 @@ int x = pulseToPWM(PS4Controller[RStickX]);
     // Mix for arcade drive
   int left = y + x;
   int right = y - x;
-Serial.print (left);
-  Serial.print(" ");
-  Serial.print (right);
-  Serial.println();
+//Serial.print (left);
+  //Serial.print(" ");
+  //Serial.print (right);
+  //Serial.println();
+       Serial.println(PS4Controller[Circle]);
+
   // Drive motor
   Drive(left, right);
-
+  Shoot();
 }
